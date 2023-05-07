@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mr.heng</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <noscript
+      ><link rel="stylesheet" href="./assets/css/noscript.css"
+    /></noscript>
+    <script src="./js/vue.min.js" language="JavaScript"></script>
+    <script src="./js/jquery-3.4.1.min.js"></script>
+    <!-- <script src="./js/html2canvas.min.js" async="async"></script> -->
+    <script src="./js/html2canvas.js"></script>
+    <style>
+      img {
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <section id="main">
+
+        <!-- Welcome Message and Contacts -->
+        <header v-show="Contacts">
+          <span class="avatar"
+            ><img
+              src="images/avatar.jpg"
+              alt=""
+              style="width: 122px; height: 122px"
+          /></span>
+          <h1>Mr.heng</h1>
+          <transition-group name="fade">
+            <div v-show="defaults" key="text">
+              <p>若在雨中，谁是那把撑开的伞；若在风中，
+                谁是那堵宽厚的墙？有些人在寻找，眼含热泪；有些人在等待，精神寂寞；
+                有些人已拥有，寻找、等待、拥有，是爱的历程，也是人生的历程，都需要强大的心灵支撑。</p>
+              <p>
+                很幸运你能从茫茫人海中找到我，我就简单的介绍一下我自己吧——》》》
+              </p>
+              <button
+                class="button small fit"
+                @click="showAbout"
+                v-bind:disabled="onTransition==1"
+              >
+                Click!
+              </button>
+            </div>
+            <div
+              v-for="item in contacts"
+              v-if="item.show"
+              key="item.name"
+              v-html="item.content"
+            ></div>
+            <button
+              class="button small"
+              key="button"
+              @click="hideContact(true)"
+              style="opacity: 0.55"
+              v-show="backButton"
+            >
+              返回
+            </button>
+          </transition-group>
+        </header>
+        <hr />
+        <footer v-show="Contacts">
+          <ul class="icons">
+            <li v-for="item in contacts">
+              <a @click="showContact(item.name)" :class="item.icon"
+                >{{item.desc}}</a
+              >
+            </li>
+          </ul>
+        </footer>
+
+        <!-- Page container -->
+        <header v-show="info">
+          <transition-group name="fade">
+            <h1 key="title">{{ title }}</h1>
+            <p key="text" v-for="text in texts">{{ text }}</p>
+            <div v-html="html" key="html"></div>
+            <img
+              v-bind:src="img"
+              key="img"
+              style="width: 95%; height: auto"
+              v-for="img in imgs"
+            />
+            <div key="buttons">
+              <button
+                class="button small"
+                v-bind:disabled="(nowPage < startPage || onTransition==1)"
+                @click="navigate(-1)"
+              >
+                上一页
+              </button>
+              <button
+                class="button small"
+                v-bind:disabled="(nowPage >= endPage - 2 || onTransition==1)"
+                @click="navigate(1)"
+              >
+                下一页
+              </button>
+            </div>
+            <hr key="br" />
+            <button
+              @click="returnToContact"
+              key="button"
+              class="button fit"
+              v-bind:disabled="onTransition==1"
+            >
+              返回
+            </button>
+          </transition-group>
+        </header>
+      </section>
+
+      <!-- Footer -->
+      <footer id="footer"></footer>
+    </div>
+    <script>
+      if ("addEventListener" in window) {
+        window.addEventListener("load", function () {
+          document.body.className = document.body.className.replace(
+            /\bis-preload\b/,
+            ""
+          );
+        });
+        document.body.className += navigator.userAgent.match(/(MSIE|rv:11\.0)/)
+          ? " is-ie"
+          : "";
+      }
+    </script>
+    <!-- Vuejs -->
+    <script language="javascript">
+      var mainsec = new Vue({
+        el: "#main",
+        data: {
+          title: "", // The title of one page
+          html: "", // HTML text of one page
+          texts: [], // Pure texts of one page
+          imgs: [], // Image url of a page's images
+
+          startPage: 1, // First page of the website
+          endPage: 3, // The last page of the website
+
+          defaults: 1, // Show welcome message
+          Contacts: 1, // Detect if to show contacts
+          info: 0, // If to show designed pages
+          deg: 0, // Main section rotate deg
+
+          backButton: true,
+
+          /*          Change things below this line               */
+          //Contact info
+          /**
+           * 有关下方icon的优化
+           * 因下方icon可以挂上用户自己的站点，所以做了如下修改
+           * jump为true，会直接跳转链接，链接为用户自定义的content字段
+           * jump为false，则是与原来一样。
+           */
+          contacts: [
+            {
+              name: "Wechat",
+              icon: "icon brands fa-weixin",
+              desc: "微信",
+              content: "<img src='images/demoQR.png' class='qr' />",
+              show: false,
+              jump: false,
+            },
+            {
+              name: "Github",
+              icon: "icon brands fa-github",
+              desc: "Github",
+              content: "https://github.com/dishitiangege/Personal-blog3",
+              show: false,
+              jump: true,
+            },
+          ],
+
+          //Pages content
+          page: [
+            {
+              title: "我是一个00后",
+              texts: [
+                " 我毕业于河南的一所大学，大学所学的专业是机械设计制造及其自动化专业。额，没错，你没看错，就是那个鼎鼎大名的所谓的“万金油”的专业，一入机械深似海,从此女生是路人。哈哈，开个玩笑，机械也没啥不好的，就业面挺广的，嗯，是挺广的。。。。。",
+              ],
+              html: "",
+              imgs: ["images/bg.jpg"],
+            },
+            {
+              title: "兴趣爱好",
+              texts: ["研究过天文，也探究过道学。涉猎过医学，没事的时候也喜欢自研一些前端开发知识，目前从事工艺相关工作", "在大学的时候拿过奖学金，也在学生会担任过一官半职，入了党，一颗红心向太阳。。。"],
+              html: "",
+              imgs: ["images/bg2.jpg"],
+            },
+            {
+              title: "价值观",
+              texts: ["心里种着一棵向日葵，生活便会一路向阳。面对人生，每个人都有不同的理解，与感触，人生没有绝对和固定的答案，只有靠自己去领悟和体验。","所有能搅扰到你的人和事，都是生命的功课，也是成长的台阶。和这个人，这件事过不去，会再次相遇同样的人，同样的事。我们需要的不是对抗，而是静下来，怀着好奇去探索、发现、成长、穿越。当心成海，就能包容很多人；当身成山，就不会随人事而飘浮。"],
+              imgs: ["images/bg3.jpg"],
+              html: "",
+            },
+            {
+              title: "尾声",
+              texts: ["介绍就到这里结束了，下次再见！"],
+              html: '<a href="./pay.html" style="color:#fff; background-color:#f0a1a8; border-radius: 0.3em; padding: 0.2em; cursor: pointer;">点我 Please click me！</a>',
+              imgs: ["images/bg4.jpg"],
+            },
+            {
+              title: "打赏Mr.heng",
+              texts: ["一分钱也是爱，涓涓细流汇成大海。"],
+              html: '',
+              imgs: ["images/demoQR.png"],
+            }
+          ],
+          /*            Change ends here                 */
+
+          nowPage: 0, // Pointer to current page
+          onTransition: 0, //If the transition animation is on
+        },
+        methods: {
+          showContact: function (name) {
+            let num = 0;
+            for (let i = 0; i < this.contacts.length; i++) {
+              if (this.contacts[i].name == name) {
+                num = i;
+                break;
+              }
+            }
+            if (this.contacts[num].jump == true) {
+              window.open(this.contacts[num].content);
+              return;
+            }
+            this.hideContact(false);
+            this.defaults = 0;
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+              this.contacts[num].show = true;
+              this.backButton = true;
+            }, 500);
+          },
+          hideContact: function (neededDefault = true) {
+            for (i = 0; i < this.contacts.length; i++) {
+              this.contacts[i].show = false;
+            }
+            clearTimeout(this.timer);
+            if (neededDefault == true) {
+              this.backButton = false;
+              this.timer = setTimeout(() => {
+                this.defaults = 1;
+              }, 500);
+            }
+          },
+          showAbout: function () {
+            this.rotateCard(-360, 1, "Y");
+
+            var that = this;
+            setTimeout(function () {
+              that.info = 1;
+              that.Contacts = 0;
+            }, 400);
+          },
+          returnToContact: function () {
+            this.rotateCard(360, 1, "Y");
+            var that = this;
+            setTimeout(function () {
+              that.info = 0;
+              that.Contacts = 1;
+            }, 400);
+          },
+          rotateCard: function (deg, time, axis) {
+            this.onTransition = 1;
+            this.deg += deg;
+            var ele = document.getElementById("main");
+            ele.style.transition = "transform " + time + "s 0s";
+            ele.style.transform = "rotate" + axis + "(" + this.deg + "deg)";
+            var that = this;
+            setTimeout(function () {
+              that.onTransition = 0;
+            }, time * 1000);
+          },
+          loadPage: function () {
+            this.title = this.page[this.nowPage].title;
+            this.texts = this.page[this.nowPage].texts;
+            this.html = this.page[this.nowPage].html;
+            this.imgs = this.page[this.nowPage].imgs;
+          },
+          navigate: function (m) {
+            if (m == 1) {
+              this.nowPage++;
+              this.rotateCard(-360, 1, "Y");
+              setTimeout("mainsec.loadPage()", 400);
+            }
+            if (m == -1) {
+              this.nowPage--;
+              this.rotateCard(+360, 1, "Y");
+              setTimeout("mainsec.loadPage()", 400);
+            }
+          },
+        },
+        mounted: function () {
+          this.loadPage();
+          this.startPage = 1;
+          this.endPage = this.page.length;
+        },
+      });
+    </script>
+    <style>
+      .fade-enter-active,
+      .fade-leave-active {
+        transition: all 0.5s;
+      }
+      .fade-enter,
+      .fade-leave-to {
+        opacity: 0;
+        transform: scale(0%, 0%);
+      }
+      .qr {
+        text-align: center;
+        width: 80%;
+        height: 80%;
+      }
+    </style>
+    <script>
+      let FirstTriggered = true;
+      function loaded() {
+        timeout = FirstTriggered ? 1200 : 0;
+        var page = getQueryVariable("page");
+        if (page >= mainsec.startPage && page <= mainsec.endPage && page) {
+          var m = mainsec;
+          mainsec.nowPage = page - 1;
+          setTimeout(function () {
+            m.rotateCard(-360, 1, "Y");
+            setTimeout(function () {
+              m.loadPage();
+              m.info = 1;
+              m.Contacts = 0;
+            }, 400);
+          }, timeout);
+        }
+        if (FirstTriggered) {
+          $("body").on("dblclick", "img", function () {
+            window.open(this.src);
+          });
+        }
+        if (
+          getQueryVariable("showContacts") ||
+          getQueryVariable("showcontacts")
+        ) {
+          var url;
+          var browser = navigator.userAgent.toLowerCase();
+          if (mainsec.info == 1) {
+            mainsec.returnToContact();
+          }
+          if (browser.match(/MicroMessenger/i) == "micromessenger") {
+            //微信浏览器
+            url = "https://u.wechat.com/EO3JtzoXctOZXiAG8tvYHuI";
+            setTimeout(function () {
+              mainsec.showContact("Wechat");
+            }, 1500);
+          } else if (
+            browser.indexOf(" qq") != -1 &&
+            browser.indexOf("mqqbrowser") != -1
+          ) {
+            //qq内置浏览器
+            url =
+              "https://qm.qq.com/cgi-bin/qm/qr?k=OZm0covTGqrELIwI0XKV6LxlKsCcLIsm";
+            setTimeout(function () {
+              mainsec.showContact("QQ");
+            }, 1500);
+          }
+        }
+
+        FirstTriggered = false;
+      }
+    </script>
+    <script src="js/common.js"></script>
+  </body>
+</html>
